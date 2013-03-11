@@ -1,14 +1,18 @@
 document.addEventListener('DOMContentLoaded', function() {
     var onClick = function(e) {
-        console.log(e.target.getAttribute('data-id'));
-        chrome.tabs.update(parseInt(e.target.getAttribute('data-id'), 10), { selected: true });
-        return false;
+        var id = e.target.getAttribute('data-id') || e.target.parentNode.getAttribute('data-id');
+        if(id) {
+            chrome.tabs.update(parseInt(id, 10), { selected: true });
+            return false;
+        }
+        return true;
     };
-    var ul = document.getElementsByTagName('ul').item(0);
+    var ul = document.getElementsByTagName('ol').item(0);
     chrome.tabs.getAllInWindow(function(tabs) {
         tabs.forEach(function(t) {
             var li = document.createElement('li');
             li.setAttribute('data-url', t.url);
+            li.setAttribute('title', t.url);
             li.setAttribute('data-id', t.id);
 
             if(t.favIconUrl) {
@@ -20,16 +24,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             var span1 = document.createElement('span');
+            span1.setAttribute('class', 'title');
             span1.textContent = t.title;
             li.appendChild(span1);
 
-            li.appendChild(document.createElement('br'));
-            
             var span2 = document.createElement('span');
-            span2.textContent = t.url;
+            span2.setAttribute('class', 'domain');
+            span2.textContent = t.url.indexOf('chrome://') == 0 ? t.url : t.url.replace(/^[^:]+:\/\//, '').replace(/\/.*$/, '');
             li.appendChild(span2);
 
-            li.addEventListener('click', onClick);
+            li.addEventListener('click', onClick, true);
             if(t.selected) {
                 li.setAttribute('class', 'selected');
             }
@@ -48,8 +52,12 @@ document.addEventListener('DOMContentLoaded', function() {
         var queries = input.value.split(/[ 　]/);
         var lis = ul.getElementsByTagName('li');
         for(var i = 0, l = lis.length; i < l; i++) {
-            var li = lis.item(i);
-            var matched = queries.every(function(q) { return li.textContent.indexOf(q) >= 0; });
+            var li = lis.item(i),
+                url = li.getAttribute('data-url'),
+                title = li.getAttribute('data-title');
+            var matched = queries.every(function(q) {
+                return (url && url.indexOf(q) >= 0) || (title && title.indexOf(q) >= 0);
+            });
             li.style.display = matched ? '' : 'none';
         }
     };

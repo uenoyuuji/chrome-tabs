@@ -23,3 +23,9 @@ li img {
   vertical-align: middle;
   margin-right: 4px;
 }
+li .domain:before {
+  content: " - ";
+}
+li .domain {
+  color: #666;
+}
