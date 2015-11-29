@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var li = document.createElement('li');
             li.setAttribute('data-url', t.url);
             li.setAttribute('title', t.url);
+            li.setAttribute('data-title', t.title);
             li.setAttribute('data-id', t.id);
 
             if(t.favIconUrl) {
@@ -43,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var input = document.getElementsByTagName('input').item(0);
     var lastQuery = '';
-    var listener = function() {
+    var updateResult = function() {
         if(lastQuery === input.value) {
             return;
         }
@@ -56,14 +57,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 url = li.getAttribute('data-url'),
                 title = li.getAttribute('data-title');
             var matched = queries.every(function(q) {
-                return (url && url.indexOf(q) >= 0) || (title && title.indexOf(q) >= 0);
+                switch(searchType) {
+                case 'all':
+                    return (url && url.indexOf(q) >= 0) || (title && title.indexOf(q) >= 0);
+                case 'title':
+                    return (title && title.indexOf(q) >= 0);
+                case 'url':
+                    return (url && url.indexOf(q) >= 0);
+                default:
+                    return false;
+                }
             });
+            console.log(title + ' : ' + url + ' : ' + matched);
             li.style.display = matched ? '' : 'none';
         }
     };
-    input.addEventListener('keydown', listener);
-    input.addEventListener('change', listener);
-    setInterval(listener, 1000);
+
+    var searchType;
+    var radios = document.getElementsByName('type');
+    var typeChanged = function() {
+        for(var i = 0, l = radios.length; i < l; i++) {
+            var r = radios.item(i);
+            if(r.checked) {
+                searchType = r.value;
+                lastQuery = null;
+                break;
+            }
+        }
+        updateResult();
+    };
+    typeChanged();
+    for(var i = 0, l = radios.length; i < l; i++) {
+        radios.item(i).addEventListener('change', typeChanged);
+    }
+
+    input.addEventListener('keydown', updateResult);
+    input.addEventListener('change', updateResult);
+    setInterval(updateResult, 1000);
 
     document.addEventListener('keydown', function(e) {
         if(e.keyCode === 27) {
