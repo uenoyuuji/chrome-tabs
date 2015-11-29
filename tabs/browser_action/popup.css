@@ -1,5 +1,4 @@
 body {
-  font-size: 90%;
   width: 400px;
 }
 
@@ -8,7 +7,7 @@ input[type="search"] {
 }
 
 li {
-   cursor: pointer;
+  cursor: pointer;
 }
 li:hover {
   color: #03a;
@@ -32,5 +31,8 @@ li .domain:before {
   content: " - ";
 }
 li .domain {
-  color: #666;
+  color: #062;
+}
+li span {
+  vertical-align: middle;
 }
