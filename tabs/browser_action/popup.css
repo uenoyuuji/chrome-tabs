@@ -10,12 +10,17 @@ input[type="search"] {
 li {
    cursor: pointer;
 }
-li.selected {
-  font-weight: bold;
-}
 li:hover {
   color: #03a;
   text-decoration: underline;
+}
+li.selected {
+  color: #000;
+  text-decoration: none;
+  cursor: default;
+}
+li.selected .title {
+  font-weight: bold;
 }
 li img {
   width: 16px;
